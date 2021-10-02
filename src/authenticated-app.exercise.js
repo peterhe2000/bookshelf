@@ -61,7 +61,7 @@ function AuthenticatedApp({user, logout}) {
 
 function NavLink(props) {
   // 🐨 change this from an <a /> to a <Link />
-  const match = useMatch('/some-path')
+  const match = useMatch(props.to)
   return (
     <Link
       css={[

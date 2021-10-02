@@ -2,6 +2,7 @@
 import {jsx} from '@emotion/core'
 
 import * as React from 'react'
+import {useAsync} from 'utils/hooks'
 import './bootstrap'
 import Tooltip from '@reach/tooltip'
 import {FaSearch, FaTimes} from 'react-icons/fa'
@@ -11,32 +12,16 @@ import {client} from './utils/api-client'
 import * as colors from './styles/colors'
 
 function DiscoverBooksScreen() {
-  const [status, setStatus] = React.useState('idle')
-  const [error, setError] = React.useState(null)
-  const [data, setData] = React.useState(null)
+  const {data, error, run, isLoading, isError, isSuccess} = useAsync()
   const [query, setQuery] = React.useState('')
   const [queried, setQueried] = React.useState(false)
-
-  const isLoading = status === 'loading'
-  const isSuccess = status === 'success'
-  const isError = status === 'error'
 
   React.useEffect(() => {
     if (!queried) {
       return
     }
-    setStatus('loading')
-    client(`books?query=${encodeURIComponent(query)}`).then(
-      responseData => {
-        setData(responseData)
-        setStatus('success')
-      },
-      error => {
-        setError(error)
-        setStatus('error')
-      },
-    )
-  }, [queried, query])
+    run(client(`books?query=${encodeURIComponent(query)}`))
+  }, [queried, query, run])
 
   function handleSearchSubmit(event) {
     event.preventDefault()

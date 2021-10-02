@@ -3,12 +3,29 @@ import {jsx} from '@emotion/core'
 
 import * as React from 'react'
 import * as auth from 'auth-provider'
+import {client} from './utils/api-client'
 import {AuthenticatedApp} from './authenticated-app'
 import {UnauthenticatedApp} from './unauthenticated-app'
+
+async function getUser() {
+  let user = null
+
+  const token = await auth.getToken()
+  if (token) {
+    const data = await client('me', {token})
+    user = data.user
+  }
+
+  return user
+}
 
 function App() {
   // 🐨 useState for the user
   const [user, setUser] = React.useState(null)
+
+  React.useEffect(() => {
+    getUser().then(u => setUser(u))
+  }, [])
 
   // 🐨 create a login function that calls auth.login then sets the user
   const login = form => auth.login(form).then(u => setUser(u))
@@ -19,6 +36,7 @@ function App() {
     auth.logout()
     setUser(null)
   }
+
   // 🐨 if there's a user, then render the AuthenticatedApp with the user and logout
   // 🐨 if there's not a user, then render the UnauthenticatedApp with login and register
 

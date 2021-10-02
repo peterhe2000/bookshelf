@@ -5,7 +5,7 @@ import * as React from 'react'
 // We'll be doing a lot of stuff with the router on this page.
 // 🐨 Here's what you'll need to import from react-router-dom
 // Routes, Route, Link
-import {Routes, Route, Link} from 'react-router-dom'
+import {Routes, Route, Link, useMatch} from 'react-router-dom'
 import {Button} from './components/lib'
 import * as mq from './styles/media-queries'
 import * as colors from './styles/colors'
@@ -61,23 +61,35 @@ function AuthenticatedApp({user, logout}) {
 
 function NavLink(props) {
   // 🐨 change this from an <a /> to a <Link />
+  const match = useMatch('/some-path')
   return (
     <Link
-      css={{
-        display: 'block',
-        padding: '8px 15px 8px 10px',
-        margin: '5px 0',
-        width: '100%',
-        height: '100%',
-        color: colors.text,
-        borderRadius: '2px',
-        borderLeft: '5px solid transparent',
-        ':hover': {
-          color: colors.indigo,
-          textDecoration: 'none',
-          background: colors.gray10,
+      css={[
+        {
+          display: 'block',
+          padding: '8px 15px 8px 10px',
+          margin: '5px 0',
+          width: '100%',
+          height: '100%',
+          color: colors.text,
+          borderRadius: '2px',
+          borderLeft: '5px solid transparent',
+          ':hover': {
+            color: colors.indigo,
+            textDecoration: 'none',
+            background: colors.gray10,
+          },
         },
-      }}
+        match
+          ? {
+              borderLeft: `5px solid ${colors.indigo}`,
+              background: colors.gray10,
+              ':hover': {
+                background: colors.gray10,
+              },
+            }
+          : null,
+      ]}
       {...props}
     />
   )
@@ -124,6 +136,7 @@ function AppRoutes({user}) {
   //     *                 <NotFoundScreen />
   //
   // Make sure to check the INSTRUCTIONS.md for how this should be structured
+
   return (
     <Routes>
       <Route path="/discover" element={<DiscoverBooksScreen user={user} />} />

@@ -34,7 +34,7 @@ function BookScreen({user}) {
   // queryFn should be what's currently passed in the run function below
   const {data: book = loadingBook} = useQuery({
     queryKey: ['book', {bookId}],
-    queryFn: () => client(client(`books/${bookId}`, {token: user.token}).then(data => data.book)),
+    queryFn: () => client(`books/${bookId}`, {token: user.token}).then(data => data.book),
   })  
   
   // 🐨 call useQuery to get the list item from the list-items endpoint

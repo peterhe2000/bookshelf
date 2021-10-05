@@ -55,14 +55,14 @@ function StatusButtons({user, book}) {
   // queryFn should call the list-items endpoint
   const {data: listItems} = useQuery({
     queryKey: 'list-items',
-    queryFn: () => {
-      client('list-items', {token: user.token}).then(data => data.listItems)
-    },
+    queryFn: () => 
+      client('list-items', {token: user.token}).then(data => data.listItems),
   }) 
+
 
   // 🐨 search through the listItems you got from react-query and find the
   // one with the right bookId.
-  const listItem = listItems?.find(li => li.book.id === book.id)?? null;
+  const listItem = listItems?.find(li => li.bookId === book.id)?? null;
 
   // 💰 for all the mutations below, if you want to get the list-items cache
   // updated after this query finishes the use the `onSettled` config option

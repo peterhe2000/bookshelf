@@ -1,5 +1,7 @@
 // 🐨 you'll need the test server
 // 💰 the way that our tests are set up, you'll find this in `src/test/server/test-server.js`
+import {queryCache} from 'react-query'
+import * as auth from 'auth-provider'
 import {server, rest} from 'test/server'
 // 🐨 grab the client
 import {client} from '../api-client'
@@ -7,6 +9,8 @@ import {client} from '../api-client'
 const apiURL = process.env.REACT_APP_API_URL
 
 // 🐨 flesh these out:
+jest.mock('react-query')
+jest.mock('auth-provider')
 
 test('calls fetch at the endpoint with the arguments for GET requests', async () => {
   // 🐨 add a server handler to handle a test request you'll be making
@@ -100,4 +104,32 @@ test('when data is provided, it is stringified and the method defaults to POST',
   const result = await client(endpoint, {data})
 
   expect(result).toEqual(data)
+})
+
+test(`when it is 401 it automatically log user out `, async () => {
+  const endpoint = 'test-endpoint'
+  const mockResult = {mockValue: 'VALUE'}
+  server.use(
+    rest.get(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
+      return res(ctx.status(401), ctx.json(mockResult))
+    }),
+  )
+
+  const error = await client(endpoint).catch(e => e)
+  expect(error.message).toMatchInlineSnapshot(`"Please re-authenticate."`)
+
+  expect(queryCache.clear).toHaveBeenCalledTimes(1)
+  expect(auth.logout).toHaveBeenCalledTimes(1)
+})
+
+test('correctly rejects the promise if there is an error', async () => {
+  const endpoint = 'test-endpoint'
+  const testError = {message: 'Test error'}
+  server.use(
+    rest.get(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
+      return res(ctx.status(400), ctx.json(testError))
+    }),
+  )
+
+  await expect(client(endpoint)).rejects.toEqual(testError)
 })

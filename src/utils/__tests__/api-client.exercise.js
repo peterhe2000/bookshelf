@@ -6,14 +6,6 @@ import {client} from '../api-client'
 
 const apiURL = process.env.REACT_APP_API_URL
 
-// 🐨 add a beforeAll to start the server with `server.listen()`
-beforeAll(() => server.listen())
-// 🐨 add an afterAll to stop the server when `server.close()`
-afterAll(() => server.close())
-// 🐨 afterEach test, reset the server handlers to their original handlers
-// via `server.resetHandlers()`
-afterEach(() => server.resetHandlers())
-
 // 🐨 flesh these out:
 
 test('calls fetch at the endpoint with the arguments for GET requests', async () => {
@@ -89,26 +81,23 @@ test('allows for config overrides', async () => {
   )
 })
 
-test.todo(
-  'when data is provided, it is stringified and the method defaults to POST',
-  async () => {
-    // 🐨 create a mock data object
-    // 🐨 create a server handler very similar to the previous ones to handle the post request
-    //    💰 Use rest.post instead of rest.get like we've been doing so far
-    // 🐨 call client with an endpoint and an object with the data
-    //    💰 client(endpoint, {data})
-    // 🐨 verify the request.body is equal to the mock data object you passed
+test('when data is provided, it is stringified and the method defaults to POST', async () => {
+  // 🐨 create a mock data object
+  // 🐨 create a server handler very similar to the previous ones to handle the post request
+  //    💰 Use rest.post instead of rest.get like we've been doing so far
+  // 🐨 call client with an endpoint and an object with the data
+  //    💰 client(endpoint, {data})
+  // 🐨 verify the request.body is equal to the mock data object you passed
 
-    const endpoint = 'test-endpoint'
-    server.use(
-      rest.put(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
-        return res(ctx.json(req.body))
-      }),
-    )
+  const endpoint = 'test-endpoint'
+  server.use(
+    rest.post(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
+      return res(ctx.json(req.body))
+    }),
+  )
 
-    const data = {a: 'b'}
-    const result = await client(endpoint, {data})
+  const data = {a: 'b'}
+  const result = await client(endpoint, {data})
 
-    expect(result).toBe(data)
-  },
-)
+  expect(result).toEqual(data)
+})

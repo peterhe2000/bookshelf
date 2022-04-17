@@ -3,11 +3,10 @@ import {jsx} from '@emotion/core'
 
 import * as React from 'react'
 // 🐨 you'll need useMutation and queryCache from react-query
-import {useMutation,  queryCache}  from 'react-query'
 // 🐨 you'll also need the client from utils/api-client
-import {client} from 'utils/api-client'
 import {FaStar} from 'react-icons/fa'
 import * as colors from 'styles/colors'
+import {useUpdateListItem} from '../utils/list-items.exercise'
 
 const visuallyHiddenCSS = {
   border: '0',
@@ -28,14 +27,7 @@ function Rating({listItem, user}) {
   //   you can pass as data.
   // 💰 if you want to get the list-items cache updated after this query finishes
   // the use the `onSettled` config option to queryCache.invalidateQueries('list-items')
-  const [update] = useMutation(
-    updates => client(`list-items/${updates.id}`, {
-      method: 'PUT',
-      data: updates,
-      token: user.token,
-    }),
-    {onSettled: () => queryCache.invalidateQueries('list-items')}
-  )
+  const [update] = useUpdateListItem(user)
 
   React.useEffect(() => {
     function handleKeyDown(event) {
@@ -43,6 +35,7 @@ function Rating({listItem, user}) {
         setIsTabbing(true)
       }
     }
+
     document.addEventListener('keydown', handleKeyDown, {once: true})
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
@@ -56,7 +49,7 @@ function Rating({listItem, user}) {
       <React.Fragment key={i}>
         <input
           name={rootClassName}
-          type="radio"
+          type='radio'
           id={ratingId}
           value={ratingValue}
           checked={ratingValue === listItem.rating}

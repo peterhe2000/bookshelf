@@ -7,7 +7,7 @@ import {FaRegCalendarAlt} from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
 import {useParams} from 'react-router-dom'
 // 🐨 you'll need these:
-import {useQuery, useMutation, queryCache} from 'react-query'
+import {queryCache, useMutation, useQuery} from 'react-query'
 import {client} from 'utils/api-client'
 import {formatDate} from 'utils/misc'
 import * as mq from 'styles/media-queries'
@@ -15,28 +15,16 @@ import * as colors from 'styles/colors'
 import {Textarea} from 'components/lib'
 import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
-import bookPlaceholderSvg from 'assets/book-placeholder.svg'
-
-const loadingBook = {
-  title: 'Loading...',
-  author: 'loading...',
-  coverImageUrl: bookPlaceholderSvg,
-  publisher: 'Loading Publishing',
-  synopsis: 'Loading...',
-  loadingBook: true,
-}
+import {useBook} from '../utils/books.exercise'
 
 function BookScreen({user}) {
-  const {bookId} = useParams()  
+  const {bookId} = useParams()
 
   // 🐨 call useQuery here
   // queryKey should be ['book', {bookId}]
   // queryFn should be what's currently passed in the run function below
-  const {data: book = loadingBook} = useQuery({
-    queryKey: ['book', {bookId}],
-    queryFn: () => client(`books/${bookId}`, {token: user.token}).then(data => data.book),
-  })  
-  
+  const book = useBook(bookId, user)
+
   // 🐨 call useQuery to get the list item from the list-items endpoint
   // queryKey should be 'list-items'
   // queryFn should call the 'list-items' endpoint with the user's token
@@ -92,13 +80,15 @@ function BookScreen({user}) {
               }}
             >
               {book.loadingBook ? null : (
-                <StatusButtons user={user} book={book} />
+                <StatusButtons user={user}
+                  book={book} />
               )}
             </div>
           </div>
           <div css={{marginTop: 10, height: 46}}>
             {listItem?.finishDate ? (
-              <Rating user={user} listItem={listItem} />
+              <Rating user={user}
+                listItem={listItem} />
             ) : null}
             {listItem ? <ListItemTimeframe listItem={listItem} /> : null}
           </div>
@@ -107,7 +97,8 @@ function BookScreen({user}) {
         </div>
       </div>
       {!book.loadingBook && listItem ? (
-        <NotesTextarea user={user} listItem={listItem} />
+        <NotesTextarea user={user}
+          listItem={listItem} />
       ) : null}
     </div>
   )
@@ -120,7 +111,8 @@ function ListItemTimeframe({listItem}) {
 
   return (
     <Tooltip label={timeframeLabel}>
-      <div aria-label={timeframeLabel} css={{marginTop: 6}}>
+      <div aria-label={timeframeLabel}
+        css={{marginTop: 6}}>
         <FaRegCalendarAlt css={{marginTop: -2, marginRight: 5}} />
         <span>
           {formatDate(listItem.startDate)}{' '}
@@ -139,7 +131,7 @@ function NotesTextarea({listItem, user}) {
   // 💰 if you want to get the list-items cache updated after this query finishes
   // the use the `onSettled` config option to queryCache.invalidateQueries('list-items')
   // 💣 DELETE THIS ESLINT IGNORE!! Don't ignore the exhaustive deps rule please
-  
+
   const [mutate] = useMutation(
     updates =>
       client(`list-items/${updates.id}`, {
@@ -148,7 +140,7 @@ function NotesTextarea({listItem, user}) {
         token: user.token,
       }),
     {onSettled: () => queryCache.invalidateQueries('list-items')},
-  )  
+  )
   const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
     mutate,
   ])
@@ -161,7 +153,7 @@ function NotesTextarea({listItem, user}) {
     <React.Fragment>
       <div>
         <label
-          htmlFor="notes"
+          htmlFor='notes'
           css={{
             display: 'inline-block',
             marginRight: 10,
@@ -174,7 +166,7 @@ function NotesTextarea({listItem, user}) {
         </label>
       </div>
       <Textarea
-        id="notes"
+        id='notes'
         defaultValue={listItem.notes}
         onChange={handleNotesChange}
         css={{width: '100%', minHeight: 300}}

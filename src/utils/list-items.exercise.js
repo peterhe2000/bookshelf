@@ -1,6 +1,10 @@
 import {queryCache, useMutation, useQuery} from 'react-query'
 import {client} from './api-client.final'
 
+const defaultMutationOptions = {
+  onSettled: () => queryCache.invalidateQueries('list-items')
+};
+
 function useListItems(user) {
   // 🐨 call useQuery to get the list item from the list-items endpoint
   // queryKey should be 'list-items'
@@ -38,7 +42,35 @@ function useUpdateListItem(user) {
         data: updates,
         token: user.token,
       }),
-    {onSettled: () => queryCache.invalidateQueries('list-items')},
+    defaultMutationOptions,
   )
 }
-export {useListItems, useListItem, useUpdateListItem}
+
+function useRemoveListItem(user) {
+  // 🐨 call useMutation here and assign the mutate function to "remove"
+  // the mutate function should call the list-items/:listItemId endpoint with a DELETE
+  return useMutation(
+    ({id}) =>
+      client(`list-items/${id}`, {
+        method:'DELETE',
+        token: user.token,
+      }),
+    defaultMutationOptions,
+  )
+}
+
+function useCreateListItem(user) {
+  // 🐨 call useMutation here and assign the mutate function to "create"
+  // the mutate function should call the list-items endpoint with a POST
+  // and the bookId the listItem is being created for.
+  return useMutation(
+    ({bookId}) =>
+      client(`list-items`, {
+        data: {bookId},
+        token: user.token,
+      }),
+    defaultMutationOptions,
+  )
+}
+
+export {useListItems, useListItem, useUpdateListItem, useRemoveListItem, useCreateListItem}

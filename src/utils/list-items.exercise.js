@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query'
+import {queryCache, useMutation, useQuery} from 'react-query'
 import {client} from './api-client.final'
 
 function useListItems(user) {
@@ -22,4 +22,23 @@ function useListItem(user, bookId) {
   return listItems.find(li => li.bookId === bookId) ?? null
 }
 
-export {useListItems, useListItem}
+function useUpdateListItem(user) {
+  // 🐨 call useMutation here
+  // the mutate function should call the list-items/:listItemId endpoint with a PUT
+  //   and the updates as data. The mutate function will be called with the updates
+  //   you can pass as data.
+  // 💰 if you want to get the list-items cache updated after this query finishes
+  // the use the `onSettled` config option to queryCache.invalidateQueries('list-items')
+  // 💣 DELETE THIS ESLINT IGNORE!! Don't ignore the exhaustive deps rule please
+
+  return useMutation(
+    updates =>
+      client(`list-items/${updates.id}`, {
+        method: 'PUT',
+        data: updates,
+        token: user.token,
+      }),
+    {onSettled: () => queryCache.invalidateQueries('list-items')},
+  )
+}
+export {useListItems, useListItem, useUpdateListItem}

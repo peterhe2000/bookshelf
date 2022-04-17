@@ -25,18 +25,7 @@ function BookScreen({user}) {
   // queryFn should be what's currently passed in the run function below
   const book = useBook(bookId, user)
 
-  // 🐨 call useQuery to get the list item from the list-items endpoint
-  // queryKey should be 'list-items'
-  // queryFn should call the 'list-items' endpoint with the user's token
-  const {data: listItems} = useQuery({
-    queryKey: 'list-items',
-    queryFn: () => client(`list-items`, {token: user.token}).then(data => data.listItems),
-  })
 
-  const listItem = listItems?.find(li => li.bookId === bookId) ?? null
-  // 🦉 NOTE: the backend doesn't support getting a single list-item by it's ID
-  // and instead expects us to cache all the list items and look them up in our
-  // cache. This works out because we're using react-query for caching!
 
   const {title, author, coverImageUrl, publisher, synopsis} = book
 

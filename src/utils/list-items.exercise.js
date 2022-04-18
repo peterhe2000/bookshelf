@@ -2,7 +2,7 @@ import {queryCache, useMutation, useQuery} from 'react-query'
 import {client} from './api-client.final'
 
 const defaultMutationOptions = {
-  onSettled: () => queryCache.invalidateQueries('list-items')
+  onSettled: () => queryCache.invalidateQueries('list-items'),
 };
 
 function useListItems(user) {
@@ -13,7 +13,6 @@ function useListItems(user) {
     queryKey: 'list-items',
     queryFn: () => client(`list-items`, {token: user.token}).then(data => data.listItems),
   })
-
   return listItems ?? []
 }
 
@@ -26,7 +25,7 @@ function useListItem(user, bookId) {
   return listItems.find(li => li.bookId === bookId) ?? null
 }
 
-function useUpdateListItem(user) {
+function useUpdateListItem(user, options) {
   // 🐨 call useMutation here
   // the mutate function should call the list-items/:listItemId endpoint with a PUT
   //   and the updates as data. The mutate function will be called with the updates
@@ -42,11 +41,11 @@ function useUpdateListItem(user) {
         data: updates,
         token: user.token,
       }),
-    defaultMutationOptions,
+    {...defaultMutationOptions, ...options},
   )
 }
 
-function useRemoveListItem(user) {
+function useRemoveListItem(user, options) {
   // 🐨 call useMutation here and assign the mutate function to "remove"
   // the mutate function should call the list-items/:listItemId endpoint with a DELETE
   return useMutation(
@@ -55,11 +54,11 @@ function useRemoveListItem(user) {
         method:'DELETE',
         token: user.token,
       }),
-    defaultMutationOptions,
+    {...defaultMutationOptions, ...options},
   )
 }
 
-function useCreateListItem(user) {
+function useCreateListItem(user, options) {
   // 🐨 call useMutation here and assign the mutate function to "create"
   // the mutate function should call the list-items endpoint with a POST
   // and the bookId the listItem is being created for.
@@ -69,7 +68,7 @@ function useCreateListItem(user) {
         data: {bookId},
         token: user.token,
       }),
-    defaultMutationOptions,
+    {...defaultMutationOptions, ...options},
   )
 }
 

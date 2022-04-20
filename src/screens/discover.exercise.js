@@ -7,7 +7,7 @@ import {FaSearch, FaTimes} from 'react-icons/fa'
 import * as colors from 'styles/colors'
 import {BookRow} from 'components/book-row'
 import {BookListUL, Input, Spinner} from 'components/lib'
-import {useBookSearch} from '../utils/books.exercise'
+import {refetchBookSearchQuery, useBookSearch} from '../utils/books.exercise'
 
 function DiscoverBooksScreen({user}) {
   const [query, setQuery] = React.useState('')
@@ -23,6 +23,11 @@ function DiscoverBooksScreen({user}) {
     setQueried(true)
     setQuery(event.target.elements.search.value)
   }
+
+  React.useEffect(() => {
+    // here is clean up function when component unmount will run.
+    return () => refetchBookSearchQuery(user)
+  }, [user])
 
   return (
     <div>

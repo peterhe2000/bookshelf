@@ -40,7 +40,7 @@ function useBookSearch(query, user) {
 }
 
 function useBook(bookId, user) {
-  const data = useQuery({
+  const {data} = useQuery({
     queryKey: ['book', {bookId}],
     queryFn: () => client(`books/${bookId}`, {token: user.token}).then(data => data.book),
   })
